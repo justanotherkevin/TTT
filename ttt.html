@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <style>
+      #game_board {
+        border-style: solid
+      }
+      th {
+        border-style: inset;
+        font-size: 20px;
+        text-align: center;
+        width: 50px;
+        height: 50px;
+      }
+    </style>
+
+    <script>
+      var gameOver = false;
+      var state = [0,0,0,0,0,0,0,0,0];
+      var human = false
+      var computer = true
+      var humanValue = -1;
+      var compValue = 1;
+      var winCombo = [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+        [0,4,8],
+        [2,4,6]
+      ]
+      var squares = document.getElementsByClassName("square");
+
+
+      function markSquare(square) {
+        if(gameOver === false ) {
+          for(var x = 0; x < 9; x++ ) {
+            if(squares[x] == square && state[x] == 0) {
+              set(x, humanValue);
+              computerMove();
+            }
+          }
+        } else {
+          console.log("game is over");
+        }
+      }
+
+      function set(index, player) {
+        if(player == humanValue) {
+          squares[index].innerText = humanValue;
+          state[index] = humanValue;
+        } else {
+          squares[index].innerText = compValue;
+          state[index] = compValue;
+        }
+      }
+
+      function checkWinner(board, player) {
+        var value = player === human ? humanValue : compValue;
+        //8 differnt way of winning
+        winCombo.forEach(function(combo) {
+          if (value === state[combo[0]] &&
+            state[combo[0]] === state[combo[1]] &&
+            state[combo[1]] === state[combo[2]]) {
+              gameOver = true;
+              console.log(value + " wins!");
+            }
+        })
+        return gameOver;
+        // for(var x = 0; x < 8; x++) {
+        //   var win = true;
+        //   for(var y = 0; y < 3; y++){
+        //     if(board[winCombo[x][y]] != value) {
+        //       win = false;
+        //       break;
+        //     }
+        //   }
+        //   if(win) {
+        //     return true;
+        //   }
+        // }
+        // return false;
+      }
+
+      function returnWinner() {
+        var winner = null;
+        winCombo.forEach(function(combo) {
+          if (state[combo[0]] === state[combo[1]] && state[combo[1]] === state[combo[2]]) {
+            (combo[0] === -1 ) ?  (winner = "player") : (winner = "computer");
+          }
+        })
+        return winner;
+      }
+
+      function noMoreMove(board) {
+        var answer = board.includes(0) ? false : true;
+        return answer;
+      }
+
+      function computerMove() {
+        computerBestMove(state, 0, computer)
+      }
+
+      function computerBestMove(board, depth, player) {
+        //if player wins ... = -10
+
+        if(checkWinner(board, !player) === true) {
+          return -10 + depth;
+        }else if(noMoreMove(board) === true) {
+          return 0;
+        }
+
+        var value = player === human ? humanValue : compValue;
+        var max = -Infinity;
+        var index = 0;
+
+        for(var i = 0; i < 9; i++){
+          if(board[i] === 0) {
+            var newBoard = board.slice();
+            newBoard[i] = value;
+
+            var moveValue = -computerBestMove(newBoard, depth+1, !player);
+
+            if(moveValue > max) {
+              max = moveValue;
+              index = i;
+            }
+          }
+        }
+        if(depth === 0){
+          set(index, computer)
+        }
+        return max
+      }
+
+    </script>
+
+  </head>
+
+  <body>
+
+    <p id="message">A the message area.</p>
+
+    <button type="button" name = "choice" value = "two players" checked>Two players </button>
+    <button type="button" name = "choice" value = "vs AI">Unbeatable AI </button>
+
+    <table id='game_board'>
+      <tr>
+        <th id="square0" class = 'square' onclick="markSquare(this);"></th>
+        <th id="square1" class = 'square' onclick="markSquare(this);"></th>
+        <th id="square2" class = 'square' onclick="markSquare(this);"></th>
+      </tr>
+      <tr>
+        <th id="square3" class = 'square' onclick="markSquare(this);"></th>
+        <th id="square4" class = 'square' onclick="markSquare(this);"></th>
+        <th id="square5" class = 'square' onclick="markSquare(this);"></th>
+      </tr>
+      <tr>
+        <th id="square6" class = 'square' onclick="markSquare(this);"></th>
+        <th id="square7" class = 'square' onclick="markSquare(this);"></th>
+        <th id="square8" class = 'square' onclick="markSquare(this);"></th>
+      </tr>
+    </table>
+
+  </body>
+</html>
