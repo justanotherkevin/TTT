@@ -1,0 +1,13 @@
+function checkWinner(board, player) {
+        var value = player === human ? humanValue : compValue;
+        //8 differnt way of winning
+        var win = false;
+        winCombo.forEach(function(combo) {
+          if (value === board[combo[0]] &&
+            board[combo[0]] === board[combo[1]] &&
+            board[combo[1]] === board[combo[2]]) {
+              win = true;
+            }
+        })
+        return win;
+      }
